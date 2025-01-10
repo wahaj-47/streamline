@@ -1,0 +1,6 @@
+name: Streamline
+description: Fetch data from API endpoints with ease.
+package: Custom
+
+type: module
+core_version_requirement: ^9 || ^10

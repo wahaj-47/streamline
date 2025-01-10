@@ -1,0 +1,51 @@
+<?php
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function streamline_help($route_name, RouteMatchInterface $route_match)
+{
+  switch ($route_name) {
+    case 'help.page.streamline':
+      return t('
+        <h2>Fetch data from API endpoints with ease.</h2>
+        <p>This module allows setting up pipelines for:</p>
+        <ul>
+        <li>Requesting data from API endpoints</li>
+        <li>Parsing the data into various file formats (CSV, JSON, etc)</li>
+        <li>Saving the data</li>
+      ');
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function streamline_cron()
+{
+  // Get the queue factory.
+  $queue = \Drupal::service('queue')->get('pipeline_queue_worker');
+
+  // Load all pipeline entities.
+  $entity_storage = \Drupal::entityTypeManager()->getStorage('pipeline');
+  $entities = $entity_storage->loadMultiple();
+
+  // Add each pipeline entity to the queue.
+  foreach ($entities as $entity) {
+    /**
+     * @var \Drupal\streamline\Entity\Pipeline $entity
+     */
+    $interval = $entity->interval();
+    $interval = !empty($interval) ? $interval : 3600;
+
+    $next_execution = $entity->next_execution();
+    $request_time = \Drupal::time()->getRequestTime();
+
+    if ($request_time >= $next_execution) {
+      $entity->set('next_execution', $request_time + $interval);
+      $queue->createItem(['id' => $entity->id()]);
+    }
+  }
+}

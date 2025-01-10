@@ -1,0 +1,39 @@
+entity.pipeline.collection:
+  path: "/admin/config/content/streamline"
+  defaults:
+    _entity_list: "pipeline"
+    _title: "Manage Pipelines"
+  requirements:
+    _permission: "administer site configuration"
+
+entity.pipeline.add_form:
+  path: "/admin/config/content/streamline/add"
+  defaults:
+    _entity_form: "pipeline.add"
+    _title: "Add Pipeline"
+  requirements:
+    _permission: "administer site configuration"
+
+entity.pipeline.edit_form:
+  path: "/admin/config/content/streamline/{pipeline}"
+  defaults:
+    _entity_form: "pipeline.edit"
+    _title: "Edit Pipeline"
+  requirements:
+    _permission: "administer site configuration"
+
+entity.pipeline.delete_form:
+  path: "/admin/config/content/streamline/{pipeline}/delete"
+  defaults:
+    _entity_form: "pipeline.delete"
+    _title: "Delete Pipeline"
+  requirements:
+    _permission: "administer site configuration"
+
+entity.pipeline.execute_form:
+  path: "/admin/config/content/streamline/{pipeline}/execute"
+  defaults:
+    _entity_form: "pipeline.execute"
+    _title: "Execute Pipeline"
+  requirements:
+    _permission: "administer site configuration"

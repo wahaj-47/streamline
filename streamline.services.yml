@@ -1,0 +1,15 @@
+services:
+  plugin.manager.step:
+    class: Drupal\streamline\Plugin\Step\StepManager
+    arguments: ["@container.namespaces", "@cache.default", "@module_handler"]
+    parent: default_plugin_manager
+
+  plugin.manager.processor:
+    class: Drupal\streamline\Plugin\Processor\ProcessorPluginManager
+    arguments: ["@container.namespaces", "@cache.default", "@module_handler"]
+    parent: default_plugin_manager
+
+  plugin.manager.predicate:
+    class: Drupal\streamline\Plugin\Predicate\PredicateManager
+    arguments: ["@container.namespaces", "@cache.default", "@module_handler"]
+    parent: default_plugin_manager
