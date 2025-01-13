@@ -395,13 +395,7 @@ class Process extends StepBase implements StepInterface
 
                     foreach ($record as $key => $value) {
                         if (preg_match($regex, $key)) {
-                            if (is_array($record[$key])) {
-                                $record[$key] = array_map(function ($item) use ($plugin_instance) {
-                                    return $plugin_instance->process($item);
-                                }, $record[$key]);
-                            } else {
-                                $record[$key] = $plugin_instance->process($value);
-                            }
+                            $record[$key] = $plugin_instance->process($value);
                         }
                     }
                 }

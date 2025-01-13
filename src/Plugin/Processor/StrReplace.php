@@ -54,6 +54,16 @@ class StrReplace extends PluginBase implements ProcessorInterface
         $search = $this->configuration['search'];
         $replace = $this->configuration['replace'];
 
+        if (empty($search) || empty($replace)) return $value;
+
+        if (is_array($value)) {
+            return array_map(
+                function ($item) use ($search, $replace) {
+                    str_replace($search, $replace, $item);
+                },
+                $value
+            );
+        }
         return str_replace($search, $replace, $value);
     }
 }

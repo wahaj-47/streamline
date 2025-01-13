@@ -37,6 +37,18 @@ class StrToUpper extends PluginBase implements ProcessorInterface
      */
     public function process($value)
     {
+        if (is_array($value)) {
+            return array_map(
+                [$this, 'toUpperCase'],
+                $value
+            );
+        }
+
+        return $this->toUpperCase($value);
+    }
+
+    private function toUpperCase($value)
+    {
         if (is_string($value)) {
             return strtoupper($value);
         }

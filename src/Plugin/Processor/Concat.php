@@ -24,6 +24,12 @@ class Concat extends PluginBase implements ProcessorInterface
      */
     public function buildConfigurationForm(array $form, FormStateInterface $form_state)
     {
+        $form['separator'] = [
+            '#type' => "textfield",
+            '#title' => t('Separator'),
+            '#default_value' => $this->configuration['separator'] ?? ' ' // Defaults to a space
+        ];
+
         return $form;
     }
 
@@ -34,9 +40,11 @@ class Concat extends PluginBase implements ProcessorInterface
     {
         if (empty($value)) return "";
 
-        if (count($value) > 1) {
-            return join(" ", (array)$value);
+        if (is_array($value)) {
+            $separator = $this->configuration['separator'] ?? ' ';
+            return join($separator, $value);
         }
+
         return (string)$value;
     }
 }

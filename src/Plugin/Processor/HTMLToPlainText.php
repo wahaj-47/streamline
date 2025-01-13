@@ -37,9 +37,18 @@ class HTMLToPlainText extends PluginBase implements ProcessorInterface
             return "";
         }
 
+        if (is_array($value)) {
+            return array_map([$this, 'toPlainText'], $value);
+        }
+
+        return $this->toPlainText($value);
+    }
+
+    private function toPlainText($value)
+    {
         $dom = new DOMDocument();
         @$dom->loadHTML($value, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        $text = $this->extract_text_from_node($dom->documentElement);
+        $text = $this->extractTextFromNode($dom->documentElement);
         $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $text = str_replace(chr(160), ' ', $text);
         $text = preg_replace('/[^\x20-\x7E\t\n\r]/', '', $text);
@@ -54,7 +63,7 @@ class HTMLToPlainText extends PluginBase implements ProcessorInterface
         return trim($text);
     }
 
-    private function extract_text_from_node($node)
+    private function extractTextFromNode($node)
     {
         $text = "";
 
@@ -73,16 +82,16 @@ class HTMLToPlainText extends PluginBase implements ProcessorInterface
                         break;
 
                     case 'li':
-                        $text .= "- " . $this->extract_text_from_node($child) . "\n";
+                        $text .= "- " . $this->extractTextFromNode($child) . "\n";
                         break;
 
                     case 'ul':
                     case 'ol':
-                        $text .= "\n" . $this->extract_text_from_node($child) . "\n";
+                        $text .= "\n" . $this->extractTextFromNode($child) . "\n";
                         break;
 
                     default:
-                        $text .= $this->extract_text_from_node($child);
+                        $text .= $this->extractTextFromNode($child);
                         break;
                 }
             }

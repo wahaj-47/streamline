@@ -51,6 +51,17 @@ class PregReplace extends PluginBase implements ProcessorInterface
         $search = $this->configuration['search'];
         $replace = $this->configuration['replace'];
 
+        if (empty($search) || empty($replace)) return $value;
+
+        if (is_array($value)) {
+            return array_map(
+                function ($item) use ($search, $replace) {
+                    preg_replace($search, $replace, $item);
+                },
+                $value
+            );
+        }
+
         return preg_replace($search, $replace, $value);
     }
 }

@@ -37,6 +37,18 @@ class StrToLower extends PluginBase implements ProcessorInterface
      */
     public function process($value)
     {
+        if (is_array($value)) {
+            return array_map(
+                [$this, 'toLowercase'],
+                $value
+            );
+        }
+
+        return $this->toLowercase($value);
+    }
+
+    private function toLowercase($value)
+    {
         if (is_string($value)) {
             return strtolower($value);
         }

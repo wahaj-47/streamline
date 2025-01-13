@@ -39,22 +39,26 @@ class Format extends PluginBase implements ProcessorInterface
      */
     public function process($value)
     {
-        if (empty($value)) return "";
+        if (empty($value) || empty($this->configuration['format'])) return $value;
 
-        $format = $this->configuration['format'];
-        if (empty($format)) return $value;
+        if (is_array($value)) {
+            return array_map([$this, 'format'], $value);
+        }
 
-        preg_match_all('/\{([^}]*)\}/', $format, $matches);
+        return $this->format($value);
+    }
 
+    private function format($value)
+    {
+        preg_match_all('/\{([^}]*)\}/', $this->configuration['format'], $out);
         $values = array_map(
             function ($item) use ($value) {
                 return isset($value[$item]) ? $value[$item] : '';
             },
-            $matches[1]
+            $out[1]
         );
 
-        $format = preg_replace('/\{([^}]*)\}/', '%s', $format);
-
+        $format = preg_replace('/\{([^}]*)\}/', '%s', $this->configuration['format']);
         return vsprintf($format, $values);
     }
 }
