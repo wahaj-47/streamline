@@ -42,7 +42,7 @@ class PipelineExecuteForm extends EntityConfirmFormBase
      */
     public function getDescription()
     {
-        return $this->t('This might take a while.');
+        return $this->t('The pipeline execution will be queued and executed in the background. Continue?');
     }
 
     /**
