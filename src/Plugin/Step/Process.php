@@ -33,7 +33,7 @@ class Process extends StepBase implements StepInterface
             '#type' => 'fieldset',
             '#title' => t('Fields'),
             '#collapsible' => FALSE,
-            '#description' => t('Add fields for processing.'),
+            '#description' => t('Add fields for processing. If a field is iterable, it will loop over it and apply processor to each item'),
             '#attributes' => [
                 'id' => 'processor-step-' . $delta
             ],
@@ -378,15 +378,32 @@ class Process extends StepBase implements StepInterface
                     $config = $processor['config'] ?? [];
 
                     $plugin_manager = \Drupal::service('plugin.manager.processor');
+                    /** 
+                     * @var \Drupal\streamline\Plugin\Processor\ProcessorInterface $plugin_instance
+                     */
                     $plugin_instance = $plugin_manager->createInstance(
                         $plugin_id,
                         $config
                     );
 
-                    /** 
-                     * @var \Drupal\streamline\Plugin\Processor\ProcessorInterface $plugin_instance
-                     */
-                    $record[$identifier] = $plugin_instance->process($record[$identifier]);
+                    // Converting wildcards to regular expression
+                    // Escape dots and replace * with regex equivalent.
+                    $regex = preg_quote($identifier, '/');
+                    // Replace '*' with '.*' for regex.
+                    $regex = str_replace('\*', '.*', $regex);
+                    $regex = "/^$regex$/";
+
+                    foreach ($record as $key => $value) {
+                        if (preg_match($regex, $key)) {
+                            if (is_array($record[$key])) {
+                                $record[$key] = array_map(function ($item) use ($plugin_instance) {
+                                    return $plugin_instance->process($item);
+                                }, $record[$key]);
+                            } else {
+                                $record[$key] = $plugin_instance->process($value);
+                            }
+                        }
+                    }
                 }
             }
             return $record;

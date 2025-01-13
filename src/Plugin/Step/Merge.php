@@ -95,7 +95,7 @@ class Merge extends StepBase implements StepInterface
             $form['merge_sets'][$i]['separator'] = [
                 '#type' => 'textfield',
                 '#title' => t('Separator'),
-                '#default_value' => $this->configuration['merge_sets'][$i]['separator'] ?? '<sep>', // Default to space
+                '#default_value' => $this->configuration['merge_sets'][$i]['separator'] ?? '<sep>',
             ];
         }
 
