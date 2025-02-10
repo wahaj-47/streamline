@@ -530,72 +530,63 @@ class Tamper extends StepBase implements StepInterface
                 )
                     continue;
 
-                $with = NULL;
+                $node_type = $field['replacement']['content_type'];
 
-                $canTamper = false;
-                foreach ($field['tamper_conditions'] as $group) {
-                    if (!isset($group['group'])) continue;
+                // Load all nodes of node type
+                $nodes = \Drupal::entityTypeManager()
+                    ->getStorage('node')
+                    ->loadByProperties(['type' => $node_type]);
 
 
-                    $allConditionsMet = true;
-                    foreach ($group['group'] as $condition) {
+                /**
+                 * @var \Drupal\Core\Entity\ContentEntityBase $node
+                 */
+                foreach ($nodes as $node) {
+                    $with = NULL;
+                    $match_found = false;
 
-                        if (!isset($condition['condition'])) continue;
+                    foreach ($field['tamper_conditions'] as $group) {
+                        if (!isset($group['group'])) continue;
 
-                        $haystack = $record[$condition['condition']['haystack']];
-                        $plugin_id = $condition['condition']['predicate'];
-                        $node_type = $field['replacement']['content_type'];
-                        $node_field = $condition['condition']['entity_fields'];
+                        $all_conditions_met = true;
+                        foreach ($group['group'] as $condition) {
+                            if (!isset($condition['condition'])) continue;
 
-                        // Load plugin
-                        $plugin_manager = \Drupal::service('plugin.manager.predicate');
-                        $plugin_instance = $plugin_manager->createInstance(
-                            $plugin_id,
-                        );
+                            $haystack = $record[$condition['condition']['haystack']];
+                            $plugin_id = $condition['condition']['predicate'];
+                            $node_field = $condition['condition']['entity_fields'];
 
-                        // Load all nodes of node type
-                        $nodes = \Drupal::entityTypeManager()
-                            ->getStorage('node')
-                            ->loadByProperties(['type' => $node_type]);
+                            // Load plugin
+                            $plugin_manager = \Drupal::service('plugin.manager.predicate');
+                            $plugin_instance = $plugin_manager->createInstance(
+                                $plugin_id,
+                            );
 
-                        $currentConditionMet = false;
-
-                        // Foreach node: pass the haystack and $node[$node_field] to the predicate plugin
-                        foreach ($nodes as $node) {
-
-                            /**
-                             * @var \Drupal\Core\Entity\ContentEntityBase $node
-                             */
                             $needle = $node->get($node_field)->getString();
 
                             /**
                              * @var \Drupal\streamline\Plugin\Predicate\PredicateInterface $plugin_instance
                              */
-                            $currentConditionMet = $plugin_instance->evaluate($haystack, $needle);
-
-                            if ($currentConditionMet) {
-                                switch ($field['replacement']['entity_fields']) {
-                                    case 'nid':
-                                        $with = $node->id();
-                                        break;
-
-                                    default:
-                                        $with = $node->get($field['replacement']['entity_fields']);
-                                        break;
-                                }
-
-                                break;
-                            }
+                            $all_conditions_met = $all_conditions_met && $plugin_instance->evaluate($haystack, $needle);
+                            if (!$all_conditions_met) break;
                         }
 
-                        $allConditionsMet = $allConditionsMet && $currentConditionMet;
+                        $match_found = $match_found || $all_conditions_met;
                     }
 
-                    $canTamper = $canTamper || $allConditionsMet;
-                }
+                    if ($match_found) {
+                        switch ($field['replacement']['entity_fields']) {
+                            case 'nid':
+                                $with = $node->id();
+                                break;
 
-                if ($canTamper) {
-                    $record[$field['replace']['identifier']] = $with ?? $record[$field['replace']['identifier']];
+                            default:
+                                $with = $node->get($field['replacement']['entity_fields']);
+                                break;
+                        }
+                        $record[$field['replace']['identifier']] = $with ?? $record[$field['replace']['identifier']];
+                        break;
+                    }
                 }
             }
 
