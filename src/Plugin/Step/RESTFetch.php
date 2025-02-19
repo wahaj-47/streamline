@@ -292,7 +292,11 @@ class RESTFetch extends FetchBase implements StepInterface
             $token = $this->authenticate();
         }
 
-        $options = [];
+        $options = [
+            'headers' => [
+                'Cache-Control' => 'no-cache'
+            ]
+        ];
 
         if ($token != NULL) {
             $options['headers'] = ['Authorization' => 'Bearer ' . $token];
