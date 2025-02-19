@@ -294,7 +294,9 @@ class RESTFetch extends FetchBase implements StepInterface
 
         $options = [
             'headers' => [
-                'Cache-Control' => 'no-cache'
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache', // For backward compatibility with HTTP/1.0
+                'Expires' => '0'        // Ensures the response is always considered expired
             ]
         ];
 
