@@ -331,10 +331,6 @@ class RESTFetch extends FetchBase implements StepInterface
             $options['query'][$pagination_param]++;
         } while (!$this->empty_recursive($response_data));
 
-        \Drupal::logger('streamline')->debug('Fetched data: @data', [
-            '@data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-        ]);
-
         return $data;
     }
 

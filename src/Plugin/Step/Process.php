@@ -403,11 +403,6 @@ class Process extends StepBase implements StepInterface
             return $record;
         }, $input);
 
-
-        \Drupal::logger('streamline')->debug('Processed data: @data', [
-            '@data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-        ]);
-
         return $data;
     }
 }

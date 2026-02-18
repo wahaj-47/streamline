@@ -92,10 +92,6 @@ class OAIPMHFetch extends FetchBase implements StepInterface
             }
         } while (!empty($resumptionToken));
 
-        \Drupal::logger('streamline')->debug('Fetched data: @data', [
-            '@data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-        ]);
-
         return $data;
     }
 }

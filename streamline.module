@@ -16,6 +16,7 @@ function streamline_help($route_name, RouteMatchInterface $route_match)
         <li>Requesting data from API endpoints</li>
         <li>Parsing the data into various file formats (CSV, JSON, etc)</li>
         <li>Saving the data</li>
+        </ul>
       ');
   }
 }

@@ -47,10 +47,6 @@ class Index extends StepBase implements StepInterface
             $data = $input[$key];
         }
 
-        \Drupal::logger('streamline')->debug('Indexed data: @data', [
-            '@data' => json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
-        ]);
-
         return $data;
     }
 }
