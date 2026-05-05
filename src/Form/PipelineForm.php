@@ -29,7 +29,7 @@ class PipelineForm extends EntityForm
      */
     public static function create(ContainerInterface $container)
     {
-        return new static(
+        return new self(
             $container->get('entity_type.manager')
         );
     }
@@ -242,6 +242,7 @@ class PipelineForm extends EntityForm
         }
 
         $form_state->setRedirect('entity.pipeline.collection');
+        return $status;
     }
 
     /**
@@ -249,7 +250,10 @@ class PipelineForm extends EntityForm
      */
     public function exist($id)
     {
-        $entity = $this->entityTypeManager->getStorage('pipeline')->getQuery()
+        $entity = $this->entityTypeManager
+            ->getStorage('pipeline')
+            ->getQuery()
+            ->accessCheck(FALSE)
             ->condition('id', $id)
             ->execute();
         return (bool) $entity;
